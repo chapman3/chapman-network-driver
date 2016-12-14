@@ -1,0 +1,47 @@
+David Chapman
+chapman3
+University of Oregon
+CIS 415
+Spring 2016
+
+Report:
+
+Currently networkdriver.c compiles and runs. 
+grep Error, Warning and BUG yield no return when performed on mydemo's output.
+
+I am extremely pleased with my work on this project. 
+
+See diagram.pdf for my design diagram, but implementation decisions were:
+	[]incoming_thread
+	       +originally I thought I would use blocking_get_pd prior to the
+		init_packet_descriptor call to ensure that thread can't proceed
+		until a packet has been received, else the following 
+		initializer will fail due to an unsynchronized state.
+		However, after testing and dropping packets I decided to
+		switch to nonblocking_get_pd to increase packet availability
+		and it ended my packet dropping errors.
+	       +use nonblocking_get_pd to allow the thread to continue, 
+		since synchronization of pd at that point is non important.
+	[]outgoing_thread
+	       +use blockingReadBB to read packet descriptor in from bbin
+		buffer. Must block, else the packet descriptor will be
+		attempted to pass in an unsynchronized state.
+	       +use nonblocking_put_pd for quick turn around since return 
+		the pd being sent to the fpds will be unneccessary for the 
+		upcoming loop of the outgoing_thread.
+	[]init_network_driver
+	       +made buffers at a size that seemed to be more than enough 
+		without being excessive. Not sure what the implementation of
+		BoundedBuffer.c looks like, but I feel like 2-4 is appropriate
+		per pd.
+
+Assistance:
+	Elizabeth helped evaluate my design and direction as well as with 
+	the basics of my two pthread functions.
+
+	I received minor debugging help from Raleigh, a masters student. The
+	degree of this was I told him my errors, and he told me a likely cause.
+	
+	I used the video at youtube.com/fcHngVr4y7M for help with pthreads. 
+	
+	StackOverflow and other online resources helped in debugging.
